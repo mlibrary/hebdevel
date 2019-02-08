@@ -1,0 +1,24 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    cvs (0.1.0)
+    fileutils (1.1.0)
+    htmlentities (4.3.4)
+    image_size (2.0.0)
+    rake (12.3.2)
+    rexml (3.2.0)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  bundler
+  cvs
+  fileutils
+  htmlentities
+  image_size (~> 2.0)
+  rake
+  rexml
+
+BUNDLED WITH
+   1.17.1

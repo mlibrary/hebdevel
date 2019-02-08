@@ -1,0 +1,14 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rake (12.3.2)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  bundler
+  rake
+
+BUNDLED WITH
+   2.0.1

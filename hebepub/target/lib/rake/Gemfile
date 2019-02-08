@@ -1,0 +1,8 @@
+source "https://rubygems.org"
+gem "bundler"
+gem "cvs"
+gem "fileutils"
+gem "htmlentities"
+gem "image_size", "~> 2.0"
+gem "rake"
+gem "rexml"

@@ -1,0 +1,86 @@
+# This is a rakefile
+
+require 'rake/clean'
+require 'fileutils'
+
+REPODIR=ENV['REPODIR']
+
+# hebepub locations
+HEBEPUBDIR=File.join(REPODIR, 'hebepub')
+HEBEPUBJARSPATH=File.join(HEBEPUBDIR, 'target', 'lib', 'jars')
+
+# hebimg src/dependencies
+HEBIMGDIR=File.join(REPODIR, 'hebimg')
+HEBIMGJAR='hebimg-jar-with-dependencies.jar'
+HEBIMGJARPATH=File.join(HEBEPUBJARSPATH, HEBIMGJAR)
+HEBIMGSRCPATH=File.join(HEBIMGDIR, 'src', 'main', 'java', 'edu', 'umich', 'mlib', 'HebImg.java')
+
+# hebxslt src/dependencies
+HEBXSLTDIR=File.join(REPODIR, 'hebxslt')
+HEBXSLTJAR='hebxslt-jar-with-dependencies.jar'
+HEBXSLTJARPATH=File.join(HEBEPUBJARSPATH, HEBXSLTJAR)
+HEBXSLTSRCPATH=File.join(HEBXSLTDIR, 'src', 'main', 'java', 'edu', 'umich', 'mlib', 'HebXSLT.java')
+
+namespace :hebdevel do
+
+    # Productions
+    desc 'build all'
+    task :build => [ :hebimg, :hebxslt ]
+
+    desc 'hebimg'
+    task :hebimg => [ HEBIMGJARPATH ]
+
+    desc 'hebxslt'
+    task :hebxslt => [ HEBXSLTJARPATH ]
+
+    task :clobber do
+        mvn_clean(HEBIMGDIR)
+        mvn_clean(HEBXSLTDIR)
+    end
+
+    # Generate hebimg jar
+    file HEBIMGJARPATH => [ HEBIMGSRCPATH ] do
+        mvn_install(HEBIMGDIR, HEBIMGJARPATH)
+    end
+
+    # Generate hebxslt jar
+    file HEBXSLTJARPATH => [ HEBXSLTSRCPATH ] do
+        mvn_install(HEBXSLTDIR, HEBXSLTJARPATH)
+    end
+
+    # Convenience method for installing a JAR.
+    def mvn_install(bdir, jar_path)
+
+        # Remove the jar file if it exists.
+        FileUtils.rm(jar_path, :force => true)
+
+        # Determine jar name
+        jar_name = File.basename(jar_path)
+
+        # Invoke maven.
+        Dir.chdir(bdir)
+        sh %{ mvn install } do |ok, res|
+            if ok
+                cp(File.join(bdir, 'target', jar_name), jar_path)
+            else
+                puts "mvn install failed for ${jar_name} (status = #{res.exitstatus})"
+            end
+        end
+    end
+
+    # Convenience method for cleaning a JAR.
+    def mvn_clean(bdir)
+        # Invoke maven.
+        Dir.chdir(bdir)
+        sh %{ mvn clean } do |ok, res|
+            if ! ok
+                puts "mvn clean failed for ${bdir} (status = #{res.exitstatus})"
+            end
+        end
+    end
+
+    CLOBBER.include(HEBIMGJARPATH)
+    CLOBBER.include(HEBXSLTJARPATH)
+    CLOBBER.include(File.join(HEBEPUBDIR, 'target', 'lib', 'rake', 'vendor'))
+
+end

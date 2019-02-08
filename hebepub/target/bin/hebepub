@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# This script generates HEB EPUBs archive and possibly the
+# bundles that can be uploaded to Fulcrum.
+#
+# This scripts sets the environment specific variables and
+# then invokes the specified rake production.
+#
+# Syntax:
+#   hebepub production [hebDir...]
+# where
+#   production      rake production, epub | bundle | clobber
+#   hebDir          optional list of HEB directories to build.
+#                       If no directory is specified, the
+#                       current working directory is used.
+
+CMDPATH=`realpath "${0}"`
+CMDNME=$(basename "${CMDPATH}")
+
+if [ $# -lt 1 ]
+then
+	echo "Syntax: ${CMDNME} production [hebDir...]"
+	exit 1
+fi
+
+# Rake task production to invoke.
+PRODUCTION="${1}"
+shift
+if [ "${PRODUCTION}" != "clobber" ]
+then
+    # For now, the rake tasks are namespaced
+    # Add the namespace so user doesn't.
+    PRODUCTION="hebepub:${PRODUCTION}"
+fi
+
+# If no directories have been specified, use
+# the current directory.
+HEBDIRLIST="${PWD}"
+if [ $# -gt 0 ]
+then
+    HEBDIRLIST=$*
+fi
+
+# Determine path to rakefile relative to this script.
+TARGETBIN=$(dirname "${CMDPATH}")
+TARGETDIR=$(dirname "${TARGETBIN}")
+RBDIR="${TARGETDIR}/lib/rake"
+RAKEFILE="${RBDIR}/rakefile"
+
+ROOTDIR=$(dirname "${TARGETDIR}")
+
+# Specifiy the location of Java
+JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+if [ "${OS:0:7}" == "Windows" ]
+then
+    JAVA_HOME="/c/Program Files/Java/jre1.8.0_172"
+fi
+PATH=${JAVA_HOME}/bin:${PATH}
+
+# Set the current directory to the bundle directory.
+cd "${RBDIR}"
+
+# Traverse the list of specified HEB source directories
+for d in ${HEBDIRLIST}
+do
+    hebdir=$(realpath "${d}")
+
+    if [ -e "${hebdir}" ] && [ ! -d "${hebdir}" ]
+    then
+        # Invalid path specified.
+        echo "${d} is not a directory."
+        continue
+    fi
+
+    # Invoke rake task on this directory.
+    echo "${PRODUCTION} ${hebdir}"
+    bundle exec rake -f "${RAKEFILE}" ${PRODUCTION} HEBDIR="${hebdir}"
+    RC=$?
+done
+
+exit ${RC}

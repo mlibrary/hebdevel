@@ -1,0 +1,14 @@
+#!/bin/bash
+
+for i in $*
+do
+    BNME=$(basename ${i})
+    if [ -e ${BNME} ]
+    then
+        echo "${BNME} exists. Skipping"
+        continue
+    fi
+
+    echo ${BNME}
+    ../../target/bin/hebepub migrate ${BNME}
+done

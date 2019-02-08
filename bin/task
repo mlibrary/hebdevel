@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# This script builds the hebdevel environment
+#
+# Syntax:
+#   task [production]
+# where
+#   production      build | clobber
+
+CMDPATH=`realpath "${0}"`
+CMDNME=$(basename "${CMDPATH}")
+
+if [ $# -lt 1 ]
+then
+	echo "Syntax: ${CMDNME} build | clobber"
+	exit 1
+fi
+
+# Task production to invoke.
+PRODUCTION="${1}"
+shift
+
+# Determine path to rakefile relative to this script.
+REPOBIN=$(dirname "${CMDPATH}")
+REPODIR=$(dirname "${REPOBIN}")
+RBDIR="${REPODIR}/lib/rake"
+RAKEFILE="${RBDIR}/rakefile"
+
+TARGETDIR="${REPODIR}/hebepub/target"
+TARGETRBDIR="${TARGETDIR}/lib/rake"
+
+RC=0
+case "${PRODUCTION}" in
+build)
+    cd "${RBDIR}"
+    bundle exec rake -f "${RAKEFILE}" hebdevel:build REPODIR="${REPODIR}"
+    RC=$?
+
+    if [ ${RC} -eq 0 ]
+    then
+        cd "${TARGETRBDIR}"
+        bundle package
+        RC=$?
+    fi
+    ;;
+clobber)
+    cd "${RBDIR}"
+    bundle exec rake -f "${RAKEFILE}" clobber hebdevel:clobber REPODIR="${REPODIR}"
+    ;;
+*)
+    echo "Invalid production: ${PRODUCTION}"
+    RC=1
+    ;;
+esac
+
+exit ${RC}

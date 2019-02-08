@@ -1,0 +1,49 @@
+#!/bin/bash
+
+CMDPATH=`realpath "${0}"`
+CMDNME=`basename "${CMDPATH}"`
+
+if [ $# -lt 2 ]
+then
+	echo "Syntax: ${CMDNME} outputDir imgFile [imgFile...]"
+	exit 1
+fi
+
+OUTPUTDIR="${1}"
+shift
+
+TARGETBIN=`dirname "${CMDPATH}"`
+TARGETDIR=`dirname "${TARGETBIN}"`
+TARGETLIB="${TARGETDIR}/lib"
+
+# Specifiy the location of Java
+JAVA_HOME="/c/Program Files/Java/jre1.8.0_172"
+#JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+PATH=${JAVA_HOME}/bin:${PATH}
+
+LIST=""
+JP2LIST=""
+for i in $*
+do
+    BNME=$(basename ${i})
+    EXT=${BNME##*.}
+    #echo ${BNME} ${EXT}
+
+    if [ "${EXT}" == "jp2" ]
+    then
+        JP2LIST="${JP2LIST}${i} "
+    elif [ "${EXT}" != "png" ]
+    then
+        LIST="${LIST}${i} "
+    fi
+done
+
+#echo ${LIST}
+java -jar "${TARGETLIB}/jars/hebimg-jar-with-dependencies.jar" convert png ${OUTPUTDIR} ${LIST}
+RC=$?
+
+#echo ${JP2LIST}
+java -jar "${TARGETLIB}/jars/hebimgjp2-jar-with-dependencies.jar" convert png ${OUTPUTDIR} ${JP2LIST}
+RC=$?
+
+exit
