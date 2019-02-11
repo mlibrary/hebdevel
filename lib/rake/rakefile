@@ -9,10 +9,18 @@ REPODIR=ENV['REPODIR']
 HEBEPUBDIR=File.join(REPODIR, 'hebepub')
 HEBEPUBJARSPATH=File.join(HEBEPUBDIR, 'target', 'lib', 'jars')
 
+# epubcheck src/dependencies
+HEBECDIR=File.join(REPODIR, 'epubcheck')
+HEBECJAR='epubcheck-jar-with-dependencies.jar'
+HEBECJARPATH=File.join(HEBEPUBJARSPATH, HEBECJAR)
+HEBECSRCPATH=File.join(HEBECDIR, 'pom.xml')
+
 # hebimg src/dependencies
 HEBIMGDIR=File.join(REPODIR, 'hebimg')
 HEBIMGJAR='hebimg-jar-with-dependencies.jar'
 HEBIMGJARPATH=File.join(HEBEPUBJARSPATH, HEBIMGJAR)
+HEBIMGJP2JAR='hebimgjp2-jar-with-dependencies.jar'
+HEBIMGJP2JARPATH=File.join(HEBEPUBJARSPATH, HEBIMGJP2JAR)
 HEBIMGSRCPATH=File.join(HEBIMGDIR, 'src', 'main', 'java', 'edu', 'umich', 'mlib', 'HebImg.java')
 
 # hebxslt src/dependencies
@@ -25,7 +33,10 @@ namespace :hebdevel do
 
     # Productions
     desc 'build all'
-    task :build => [ :hebimg, :hebxslt ]
+    task :build => [ :epubcheck, :hebimg, :hebxslt ]
+
+    desc 'epubcheck'
+    task :epubcheck => [ HEBECJARPATH ]
 
     desc 'hebimg'
     task :hebimg => [ HEBIMGJARPATH ]
@@ -34,38 +45,62 @@ namespace :hebdevel do
     task :hebxslt => [ HEBXSLTJARPATH ]
 
     task :clobber do
+        mvn_clean(HEBECDIR)
         mvn_clean(HEBIMGDIR)
         mvn_clean(HEBXSLTDIR)
     end
 
+    # Generate epubcheck jar
+    file HEBECJARPATH => [ HEBECSRCPATH ] do
+        # Remove the jar file if it exist.
+        FileUtils.rm(HEBECJARPATH, :force => true)
+
+        # Build/install the JARs. Invoke maven.
+        Dir.chdir(HEBECDIR)
+        sh %{ mvn install } do |ok, res|
+            if ! ok
+                puts "mvn install failed for ${HEBECJAR} (status = #{res.exitstatus})"
+            end
+        end
+
+        # Copy JARs to lib/jars directory
+        cp(File.join(HEBECDIR, 'target', HEBECJAR), HEBECJARPATH)
+    end
+
     # Generate hebimg jar
     file HEBIMGJARPATH => [ HEBIMGSRCPATH ] do
-        mvn_install(HEBIMGDIR, HEBIMGJARPATH)
+        # Remove the jar files if they exist.
+        FileUtils.rm(HEBIMGJARPATH, :force => true)
+        FileUtils.rm(HEBIMGJP2JARPATH, :force => true)
+
+        # Build/install the JARs. Invoke maven.
+        Dir.chdir(HEBIMGDIR)
+        sh %{ mvn install } do |ok, res|
+            if ! ok
+                puts "mvn install failed for ${HEBIMGJAR} (status = #{res.exitstatus})"
+            end
+        end
+
+        # Copy JARs to lib/jars directory
+        cp(File.join(HEBIMGDIR, 'target', HEBIMGJAR), HEBIMGJARPATH)
+        cp(File.join(HEBIMGDIR, 'target', HEBIMGJP2JAR), HEBIMGJP2JARPATH)
     end
 
     # Generate hebxslt jar
     file HEBXSLTJARPATH => [ HEBXSLTSRCPATH ] do
-        mvn_install(HEBXSLTDIR, HEBXSLTJARPATH)
-    end
+        # Remove the jar file if it exist.
+        FileUtils.rm(HEBXSLTJARPATH, :force => true)
 
-    # Convenience method for installing a JAR.
-    def mvn_install(bdir, jar_path)
-
-        # Remove the jar file if it exists.
-        FileUtils.rm(jar_path, :force => true)
-
-        # Determine jar name
-        jar_name = File.basename(jar_path)
-
-        # Invoke maven.
-        Dir.chdir(bdir)
+        # Build/install the JARs. Invoke maven.
+        Dir.chdir(HEBXSLTDIR)
         sh %{ mvn install } do |ok, res|
-            if ok
-                cp(File.join(bdir, 'target', jar_name), jar_path)
-            else
-                puts "mvn install failed for ${jar_name} (status = #{res.exitstatus})"
+            if ! ok
+                puts "mvn install failed for ${HEBXSLTJAR} (status = #{res.exitstatus})"
             end
         end
+
+        # Copy JARs to lib/jars directory
+        cp(File.join(HEBXSLTDIR, 'target', HEBXSLTJAR), HEBXSLTJARPATH)
     end
 
     # Convenience method for cleaning a JAR.
@@ -79,7 +114,9 @@ namespace :hebdevel do
         end
     end
 
+    CLOBBER.include(HEBECJARPATH)
     CLOBBER.include(HEBIMGJARPATH)
+    CLOBBER.include(HEBIMGJP2JARPATH)
     CLOBBER.include(HEBXSLTJARPATH)
     CLOBBER.include(File.join(HEBEPUBDIR, 'target', 'lib', 'rake', 'vendor'))
 
