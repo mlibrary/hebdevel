@@ -44,7 +44,7 @@ if (!File.exists?(srcdlxspath))
     end
 end
 LAYOUT=layout
-TARGETLAYOUTROOT=File.join(TARGETDIR, LAYOUT)
+TARGETLAYOUTROOT=File.join(TARGETDIR, "layouts", LAYOUT)
 SRCDLXSPATH=srcdlxspath
 ORGSRCDLXSPATH=File.join(File.dirname(srcdlxspath),"#{HEBID}_dlxs_org.xml")
 
