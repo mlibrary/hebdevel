@@ -195,7 +195,6 @@ namespace :hebepub do
         # Generate the bundle zip file.
         file_list_str = file_list.join(" ")
         print "Generating #{File.basename(BUNDLEPATH)}\n"
-	cur_os = OS.nil? ? "linux" : OS[0..6].downcase
         if file_list_str.length > 30000
             # Avoid DOS command line length limitation
             file_list_path = File.join(HEBDIR, "file_list")
