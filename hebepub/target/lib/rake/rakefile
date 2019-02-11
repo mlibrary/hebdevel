@@ -98,6 +98,18 @@ namespace :hebepub do
         end
     end
 
+    task :test do
+        cwd = Dir.pwd
+
+        Dir.chdir(IMAGESDIR)
+        Dir.glob("p*.png").each do |f|
+            f_basename = File.basename(f)
+            mv(f, '0' + f_basename[1..-1])
+        end
+
+        Dir.chdir(cwd)
+    end
+
     desc 'For fixepub, convert TIF/JP2 source to PNG.'
     task :convert => [ IMAGESDIR, METAINFSRCDIR ] do
         if LAYOUT == "fixepub"
@@ -124,8 +136,14 @@ namespace :hebepub do
                 end
             end
 
+            # Rename an jp2, replace 'p' prefix with a '0'
+            Dir.chdir(IMAGESDIR)
+            Dir.glob("p*.png").each do |f|
+                f_basename = File.basename(f)
+                mv(f, '0' + f_basename[1..-1])
+            end
+
             Dir.chdir(cwd)
-            imagetable
         end
     end
 
@@ -147,7 +165,6 @@ namespace :hebepub do
                 f_basename = File.basename(f)
                 cp(f, File.join(IMAGESDIR, f_basename))
             end
-            #imagetable
         end
     end
 
@@ -261,7 +278,6 @@ namespace :hebepub do
             # viewport.
             image_list = get_assets("images")
             image_list.each {|item| cp(item, IMAGESDIR) }
-            #imagetable
 
             rows = ""
             scan_list = Dir.glob(File.join(IMAGESDIR, "*"))
