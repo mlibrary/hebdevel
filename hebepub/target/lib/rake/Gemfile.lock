@@ -5,6 +5,9 @@ GEM
     fileutils (1.1.0)
     htmlentities (4.3.4)
     image_size (2.0.0)
+    mini_portile2 (2.4.0)
+    nokogiri (1.10.1-x64-mingw32)
+      mini_portile2 (~> 2.4.0)
     rake (12.3.2)
     rexml (3.2.0)
 
@@ -17,8 +20,9 @@ DEPENDENCIES
   fileutils
   htmlentities
   image_size (~> 2.0)
+  nokogiri
   rake
   rexml
 
 BUNDLED WITH
-   1.17.1
+   2.0.1
