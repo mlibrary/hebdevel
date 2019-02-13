@@ -43,8 +43,8 @@ require 'image_size'
 
 require_relative "common.rb"
 
-require_relative "AssetListener.rb"
-require_relative "EmptyListener.rb"
+require_relative "asset_list.rb"
+require_relative "resources.rb"
 
 Dir.glob("#{TARGETRB}/*.rake").each { |r| import r }
 
@@ -99,15 +99,8 @@ namespace :hebepub do
     end
 
     task :test do
-        cwd = Dir.pwd
-
-        Dir.chdir(IMAGESDIR)
-        Dir.glob("p*.png").each do |f|
-            f_basename = File.basename(f)
-            mv(f, '0' + f_basename[1..-1])
-        end
-
-        Dir.chdir(cwd)
+        is_empty = is_empty_table(ASSETSPATH)
+        puts "is_empty: #{is_empty}"
     end
 
     desc 'For fixepub, convert TIF/JP2 source to PNG.'
@@ -347,12 +340,12 @@ namespace :hebepub do
     # monograph and listed on the Media tab.
     def get_assets(type)
 
-        # Parse the ASSETSPATH file. Use the AssetListener
-        # class for generating the list of EPUB included
-        # images, or media assets.
+        # Parse the ASSETSPATH file for generating the list of EPUB
+        # included images, or media assets.
         assets_xml = File.new(ASSETSPATH)
-        parsed_assets = AssetListener.new
-        Document.parse_stream(assets_xml, parsed_assets)
+        #parsed_assets = AssetListener.new
+        #Document.parse_stream(assets_xml, parsed_assets)
+        parsed_assets = parsed_assets(ASSETSPATH
 
         case type
         when "images"
@@ -371,12 +364,9 @@ namespace :hebepub do
     end
 
     def resource_is_empty?(resource_path)
-        # Parse the resource_path file. Use the EmptyListener
-        # class to determine if the resource table is empty.
-        resource_xml = File.new(resource_path)
-        parsed_resource = EmptyListener.new
-        Document.parse_stream(resource_xml, parsed_resource)
-        return parsed_resource.is_empty?
+        # Parse the resource_path file to determine if the
+        # resource table is empty.
+        return is_empty_table?(resource_path)
     end
 
     # Productions for generating needed directories.
