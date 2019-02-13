@@ -21,3 +21,4 @@ hebxslt/target/
 hebxslt/hebxslt.iml
 lib/lib.iml
 resources/
+*.iml
