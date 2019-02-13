@@ -4,5 +4,6 @@ gem "cvs"
 gem "fileutils"
 gem "htmlentities"
 gem "image_size", "~> 2.0"
+gem "nokogiri"
 gem "rake"
-gem "rexml"
+
