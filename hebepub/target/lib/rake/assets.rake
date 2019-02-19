@@ -103,8 +103,9 @@ namespace :assets do
                 noid = row['noid']
                 olink = row['link']
                 link =  olink.match('^[^\(]+\(\"([^\"]+)\".*') {|m| m[1] }
-
-                media_assets[asset] = Media.new(asset, title, noid, link)
+                #embed_markup = row['embed_markup']
+                embed_markup = ""
+                media_assets[asset] = Media.new(asset, title, noid, link, embed_markup)
             end
         else
             # Generate the empty html table for this file.
@@ -179,6 +180,7 @@ namespace :assets do
                 title = m_asset.getTitle
                 noid = m_asset.getNoid
                 link = m_asset.getLink
+                #markup = m_asset.getMarkup
 
                 case f_type
                 when "image", "video"
@@ -283,11 +285,12 @@ namespace :assets do
     end
 
     class Media
-        def initialize(n, t, d, l)
+        def initialize(n, t, d, l, m)
             @name = n
             @title = t
             @noid = d
             @link = l
+            @embed_markup = m
         end
 
         def getName
@@ -303,6 +306,10 @@ namespace :assets do
 
         def getLink
             @link
+        end
+
+        def getMarkup
+            @embed_markup
         end
     end
 end
