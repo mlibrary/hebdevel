@@ -345,7 +345,7 @@ namespace :hebepub do
         assets_xml = File.new(ASSETSPATH)
         #parsed_assets = AssetListener.new
         #Document.parse_stream(assets_xml, parsed_assets)
-        parsed_assets = parsed_assets(ASSETSPATH
+        parsed_assets = parsed_assets(ASSETSPATH)
 
         case type
         when "images"
