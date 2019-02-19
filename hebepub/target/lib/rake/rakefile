@@ -320,20 +320,6 @@ namespace :hebepub do
         end
     end
 
-    # Method for image "table" *.png.
-    def imagetable
-        # Use Java XSLT 2.0 processor.
-        cwd = Dir.pwd
-        Dir.chdir "#{IMAGESDIR}"
-
-        sh %{ java -jar "#{IMGJAR}" "table" *.png > "#{IMAGESPATH}" } do |ok, res|
-            if ! ok
-                puts "XSLT failed (status = #{res.exitstatus})"
-            end
-        end
-        Dir.chdir "#{cwd}"
-    end
-
     # Method parses the ASSETSPATH file and
     # determines whether an asset should be included in the
     # EPUB archive, or be an asset associated with the
