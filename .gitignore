@@ -21,4 +21,5 @@ hebxslt/target/
 hebxslt/hebxslt.iml
 lib/lib.iml
 resources/
+meta_validation/
 *.iml
