@@ -263,6 +263,7 @@ namespace :hebepub do
             cp(SRCMARCPATH, MARCPATH)
         end
 
+        rows = ""
         if LAYOUT == "fixepub"
             # For fixed layout books, copy the page scans
             # and generate the size information for each image
@@ -271,7 +272,6 @@ namespace :hebepub do
             image_list = get_assets("images")
             image_list.each {|item| cp(item, IMAGESDIR) }
 
-            rows = ""
             scan_list = Dir.glob(File.join(IMAGESDIR, "*"))
             scan_list.each { |scan|
                 f_basename = File.basename(scan)
@@ -281,8 +281,8 @@ namespace :hebepub do
                 format = image_size.format
                 rows += sprintf(MARKUP_ROW_SCANS, f_basename, format, width, height)
             }
-            File.open(IMAGESPATH, "w") { |f| f.write(sprintf(MARKUP_TBL, "#{HEBID}_scans", HEBID, MARKUP_HEADER_SCANS, rows)) }
         end
+        File.open(IMAGESPATH, "w") { |f| f.write(sprintf(MARKUP_TBL, "#{HEBID}_scans", HEBID, MARKUP_HEADER_SCANS, rows)) }
 
         # Use XSLT to generate the updated epub structure.
         xslt(LAYOUTXSLPATH, TEIPATH)
