@@ -8,6 +8,7 @@ epubcheck/epubcheck.iml
 hebepub/fixepub/
 hebepub/flowepub/
 hebepub/resources/
+hebepub/resources
 hebepub/target/.idea/
 hebepub/target/hebepub.iml
 hebepub/target/lib/jars/
