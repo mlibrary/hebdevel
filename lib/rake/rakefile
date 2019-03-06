@@ -51,7 +51,7 @@ namespace :hebdevel do
     end
 
     # Generate epubcheck jar
-    file HEBECJARPATH => [ HEBECSRCPATH ] do
+    file HEBECJARPATH => [ HEBECSRCPATH, HEBEPUBJARSPATH ] do
         # Remove the jar file if it exist.
         FileUtils.rm(HEBECJARPATH, :force => true)
 
@@ -68,7 +68,7 @@ namespace :hebdevel do
     end
 
     # Generate hebimg jar
-    file HEBIMGJARPATH => [ HEBIMGSRCPATH ] do
+    file HEBIMGJARPATH => [ HEBIMGSRCPATH, HEBEPUBJARSPATH ] do
         # Remove the jar files if they exist.
         FileUtils.rm(HEBIMGJARPATH, :force => true)
         FileUtils.rm(HEBIMGJP2JARPATH, :force => true)
@@ -87,7 +87,7 @@ namespace :hebdevel do
     end
 
     # Generate hebxslt jar
-    file HEBXSLTJARPATH => [ HEBXSLTSRCPATH ] do
+    file HEBXSLTJARPATH => [ HEBXSLTSRCPATH, HEBEPUBJARSPATH ] do
         # Remove the jar file if it exist.
         FileUtils.rm(HEBXSLTJARPATH, :force => true)
 
@@ -113,6 +113,8 @@ namespace :hebdevel do
             end
         end
     end
+
+    directory HEBEPUBJARSPATH
 
     CLOBBER.include(HEBECJARPATH)
     CLOBBER.include(HEBIMGJARPATH)
