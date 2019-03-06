@@ -2174,7 +2174,7 @@
     </xsl:template>
 
     <xsl:function name="mlibxsl:mapTarget">
-        <xsl:param name="target" required="yes"/>
+        <xsl:param name="target"/>
 
         <xsl:variable name="tgt">
             <xsl:choose>
@@ -2191,7 +2191,7 @@
     </xsl:function>
 
     <xsl:function name="mlibxsl:genReference">
-        <xsl:param name="divNode" required="yes"/>
+        <xsl:param name="divNode"/>
 
         <xsl:variable name="parentId" select="$divNode/ancestor::*[local-name()='div'][last()]/@xml:id"/>
         <xsl:variable name="divId" select="$divNode/@xml:id"/>
