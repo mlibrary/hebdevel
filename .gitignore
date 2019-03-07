@@ -24,4 +24,5 @@ lib/lib.iml
 resources/
 meta_validation/
 alttext2csv/
+embed_assets/
 *.iml
