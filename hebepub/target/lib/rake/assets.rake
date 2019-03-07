@@ -86,31 +86,15 @@ namespace :assets do
 
     SRCLINKSCSV=File.join(RESOURCESDIR, "asset_links", "#{HEBID}.csv" )
 
+    CODER = HTMLEntities.new
+
     task :default => [ :files ]
 
     task :files => [ ASSETSPATH ]
 
     file ASSETSPATH => [ METAINFSRCDIR ] do
 
-        media_assets = Hash.new
-        coder = HTMLEntities.new
-        if File.exists?(SRCLINKSCSV)
-            # A source CSV file exists.
-            print "Manifest #{SRCLINKSCSV} exists.\n"
-            CSV.foreach(SRCLINKSCSV, :headers => true, :converters => :all, :header_converters => lambda { |h| h.downcase.gsub(' ', '_') }) do |row|
-                asset = row['file_name']
-                title = coder.encode(row['title'])
-                noid = row['noid']
-                olink = row['link']
-                link =  olink.match('^[^\(]+\(\"([^\"]+)\".*') {|m| m[1] }
-                #embed_markup = row['embed_markup']
-                embed_markup = ""
-                media_assets[asset] = Media.new(asset, title, noid, link, embed_markup)
-            end
-        else
-            # Generate the empty html table for this file.
-            print "Warning: #{SRCLINKSCSV} doesn't exist. Template created.\n"
-        end
+        media_assets = csv2media_assets(SRCLINKSCSV)
 
         assets = Hash.new
         hires = Hash.new
@@ -151,15 +135,15 @@ namespace :assets do
         rows = ""
         SRCASSETLIST.each do |f|
             asset = assets[f]
-            f_basename = asset.getBasePath
+            f_basename = asset.base_path
             f_ext = File.extname(f_basename)
             f_noext = File.basename(f_basename, f_ext)
 
-            m_type = asset.getMimeType
-            f_type = asset.getAssetType
-            is_hires = asset.getHiRes
-            width = asset.getWidth
-            height = asset.getHeight
+            m_type = asset.mimetype
+            f_type = asset.asset_type
+            is_hires = asset.hires
+            width = asset.width
+            height = asset.height
 
             # Assumne the asset is not a cover
             # image and will be uploaded to
@@ -177,16 +161,16 @@ namespace :assets do
             m_asset = nil
             if media_assets.has_key?(f_basename)
                 m_asset = media_assets[f_basename]
-                title = m_asset.getTitle
-                noid = m_asset.getNoid
-                link = m_asset.getLink
-                #markup = m_asset.getMarkup
+                title = m_asset.title
+                noid = m_asset.noid
+                link = m_asset.link
+                #markup = m_asset.embed_markup
 
                 case f_type
                 when "image", "video"
-                    markup = coder.encode(sprintf(MARKUP_EMBED_IMAGE, noid, title))
+                    #markup = CODER.encode(sprintf(MARKUP_EMBED_IMAGE, noid, title))
                 else
-                    markup = coder.encode(sprintf(MARKUP_EMBED_MEDIA, noid, title))
+                    #markup = CODER.encode(sprintf(MARKUP_EMBED_MEDIA, noid, title))
                 end
             end
 
@@ -244,72 +228,54 @@ namespace :assets do
         File.open(ASSETSPATH, "w") { |f| f.write(sprintf(MARKUP_TBL, "#{HEBID}_assets", HEBID, MARKUP_HEADER_ASSETS, rows)) }
     end
 
+    def csv2media_assets(csv_path)
+
+        media_assets = Hash.new
+        if File.exists?(csv_path)
+            # A source CSV file exists.
+            print "Manifest #{csv_path} exists.\n"
+            CSV.foreach(csv_path, :headers => true, :converters => :all, :header_converters => lambda { |h| h.downcase.gsub(' ', '_') }) do |row|
+                asset = row['file_name']
+                title = CODER.encode(row['title'])
+                noid = row['noid']
+                olink = row['link']
+                link =  olink.match('^[^\(]+\(\"([^\"]+)\".*') {|m| m[1] }
+                #embed_markup = row['embed_markup']
+                embed_markup = ""
+                media_assets[asset] = Media.new(asset, title, noid, link, embed_markup)
+            end
+        else
+            # Generate the empty html table for this file.
+            print "Warning: #{csv_path} doesn't exist. Template created.\n"
+        end
+        return media_assets
+    end
+
     class Asset
+
+        attr_reader :path, :base_path, :mimetype, :asset_type, :hires, :width, :height
+
         def initialize(p, m, a, hres, w, h)
             @path = p
             @base_path = File.basename(p)
             @mimetype = m
-            @assettype = a
+            @asset_type = a
             @hires = hres
             @width = w
             @height = h
         end
-
-        def getPath
-            @path
-        end
-
-        def getBasePath
-            @base_path
-        end
-
-        def getMimeType
-            @mimetype
-        end
-
-        def getAssetType
-            @assettype
-        end
-
-        def getHiRes
-            @hires
-        end
-
-        def getWidth
-            @width
-        end
-
-        def getHeight
-            @height
-        end
     end
 
     class Media
+
+        attr_reader :name, :title, :noid, :link, :embed_markup
+
         def initialize(n, t, d, l, m)
             @name = n
             @title = t
             @noid = d
             @link = l
             @embed_markup = m
-        end
-
-        def getName
-            @name
-        end
-
-        def getTitle
-            @title
-        end
-        def getNoid
-            @noid
-        end
-
-        def getLink
-            @link
-        end
-
-        def getMarkup
-            @embed_markup
         end
     end
 end
