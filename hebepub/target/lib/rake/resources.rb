@@ -19,14 +19,6 @@ class EmptyTableParser < Nokogiri::XML::SAX::Document
         end
     end
 
-    def characters(string)
-        # Any characters between the start and end element expected as a string
-    end
-
-    def end_element(name)
-        # Given the name of an element once its closing tag is reached
-    end
-
     def is_empty?
         return @role_empty
     end
