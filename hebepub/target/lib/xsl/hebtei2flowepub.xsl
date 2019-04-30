@@ -571,8 +571,11 @@
     </xsl:template>
 
     <xsl:template match="tei:div/tei:head">
-
         <xsl:choose>
+            <!-- Condition needed to remove "[Epigraph]" heading from
+                within heb99016.0001.001 epub. Heading is left in TOC.
+            <xsl:when test="@dlxs:status = 'nodisplay'"></xsl:when>
+            -->
             <xsl:when test="count(./tei:bibl[@type!='para']) >= 1">
                 <xsl:element name="header" namespace="{$HTML_URL}">
                     <xsl:attribute name="class" select="'text-center'"/>
@@ -586,25 +589,6 @@
                 <xsl:apply-templates/>
             </xsl:otherwise>
         </xsl:choose>
-
-        <!--
-        <xsl:choose>
-            <xsl:when test="../@dlxs:level > 4">
-                <xsl:element name="h6" namespace="{$HTML_URL}">
-                    <xsl:attribute name="class" select="concat('text-center ','h',../@dlxs:level)"/>
-
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:variable name="hName" select="concat('h',../@dlxs:level+2)"/>
-                <xsl:element name="{$hName}" namespace="{$HTML_URL}">
-                    <xsl:attribute name="class" select="'text-center'"/>
-                    <xsl:apply-templates/>
-                </xsl:element>
-            </xsl:otherwise>
-        </xsl:choose>
-        -->
     </xsl:template>
 
     <xsl:template match="tei:head" mode="toc">
