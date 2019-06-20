@@ -222,6 +222,13 @@
         <xsl:result-document href="{$href}" method="xml">
             <xsl:element name="html" namespace="{$HTML_URL}">
                 <xsl:element name="head" namespace="{$HTML_URL}">
+                    <xsl:for-each select="$stylesList">
+                        <xsl:element name="link" namespace="{$HTML_URL}">
+                            <xsl:attribute name="href" select="concat('styles',$FILE_SEPARATOR,.)"/>
+                            <xsl:attribute name="rel" select="'stylesheet'"/>
+                            <xsl:attribute name="type" select="'text/css'"/>
+                        </xsl:element>
+                    </xsl:for-each>
                     <xsl:element name="meta" namespace="{$HTML_URL}">
                         <xsl:attribute name="name" select="'viewport'"/>
                         <xsl:attribute name="content" select="'width=device-width,height=device-height'"/>
@@ -235,7 +242,7 @@
                         <xsl:if test="$isHidden='yes'">
                             <xsl:attribute name="hidden" select="''"/>
                         </xsl:if>
-                        <xsl:element name="h1" namespace="{$HTML_URL}">
+                        <xsl:element name="h3" namespace="{$HTML_URL}">
                             <xsl:value-of select="$navHeader"/>
                         </xsl:element>
 

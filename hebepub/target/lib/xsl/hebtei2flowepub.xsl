@@ -390,6 +390,12 @@
             <xsl:element name="itemref" namespace="{$IDPF_URL}">
                 <xsl:attribute name="idref" select="'cover'"/>
             </xsl:element>
+            <!-- Uncomment if the toc should be added to book.
+                Question would be proper location within spine.
+            <xsl:element name="itemref" namespace="{$IDPF_URL}">
+                <xsl:attribute name="idref" select="'toc'"/>
+            </xsl:element>
+             -->
             <xsl:for-each select="$textList">
                 <xsl:variable name="textElem" select="."/>
                 <xsl:variable name="divList" select="./tei:div"/>
